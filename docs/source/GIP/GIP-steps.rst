@@ -116,7 +116,7 @@ Evaluate chromosome coverage
 
 | While reads are mapped in the previous step against the entire genome, the user may want to instruct GIP to consider for this step and all the downstream analyses just a sub-set of chromosomes.
 | This GIP feature is useful when dealing with unfinished genome assemblies, containing large amounts of unplaced contigs with very poor annotation available.
-| For this purpose, the user can set the parameter ``--chrs``, listing the identifiers of the chromosomes of interest. Please note that the chromosome identifiers must be separated by white spaces and provided as a text string enclosed in backslash escaped quotation marks. For instance if the user what to limit the analysis to chromosomes chr1, chr2 and chr3 then parameter should be ``chrs="\"1 2 3\""``.
+| For this purpose, the user can set the parameter ``--chrs``, listing the identifiers of the chromosomes of interest. Please note that the chromosome identifiers must be separated by white spaces and provided as a text strings enclosed in backslash escaped quotation marks. For instance if the user whants to limit the analysis to chromosomes chr1, chr2 and chr3, the parameter should be ``chrs="\"1 2 3\""``.
 | Otherwise, by default this parameter is set to "all", indicating that all chromosomes present in the input fasta genome will be considered.
 
 
@@ -125,9 +125,9 @@ Measure genomic bin sequencing coverage
 
 | Mapped reads are used to measure the sequencing coverage of genomic bins in the *covPerBin* process.
 | The ``--binSize`` parameter (default 300) controls the bin size (i.e. the number of nucleotides for each bin).
-| The sequencing coverage of each bin normalized by
+| The sequencing coverage of each bin is normalized by median chromosome sequencing coverage
 
-| GIP At this step:
+| GIP, at this step:
 
 1. Computes the sequencing depth of each nucleotide without normalizing
 2. Divides the genome in contiguous genomic bins whose size is determined by the ``--binSize`` parameter (default 300bp)
@@ -148,9 +148,9 @@ Measure genomic bin sequencing coverage
 
 | The ``--covPerBinSigOPT`` parameter accepts a string of 3 parameters, and can be used to customize the detection of bin and segments of interest.
 
-* *--minLen*  - minimum segment length (bp) [int]
-* *--pThresh* - adjusted p-value threshold [num]
-* *--padjust* - multiple-testing correction method [num]
+* *\-\-minLen*  - minimum segment length (bp) [int]
+* *\-\-pThresh* - adjusted p-value threshold [num]
+* *\-\-padjust* - multiple-testing correction method [num]
 
 | The ``--covPerBinSigOPT`` default is ``"--minLen 0 --pThresh 0.001 --padjust BY"``. The available methods for multiple testing corrections are: "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none". Please refer to documentation of the `p.adjust <https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/p.adjust>`_ R function for more details.
 
@@ -206,9 +206,9 @@ Measure gene sequencing coverage
 | Mapped reads are used to measure the mean sequencing coverage of annotated genes in the *covPerGe* process.
 | GIP normalizes the coverage scores by the chromosome median coverage. To correct for potential GC-content biases at gene level GIP utilizes the same approach described for genomic bins (option enabled by ``CGcorrect = true``, see above). To detect statistically significant CNV genes GIP fits a Gaussian mixture distribution with 2 components. One distribution accounting for the vast majority of observations fitting the coverage of non-CNV genes (central distribution), and another distribution fitting the CNV genes (outliers distribution). The central distributions represents the-null hypothesis under which a given coverage value is merely caused by artefact fluctuations in sequencing depth, rather than a genuine, biologically meaningful gene amplification or depletion. To test CNV significance GIP uses the mean and the standard deviation of the central distribution and assigns a z-score and a p-value to all genes. Significant genes with a mean MAPQ score lower than ``--MAPQ`` are discarded. In the same way as for genomic bins, the parameter ``--customCoverageLimits`` can be used to enforce custom coverage threshold on significant genes. The parameter ``--covPerGeSigOPT`` accepts  a string of 3 parameters and can be used to control the statical test.
 
-* *--pThresh* - adjusted p-value threshold [num]
-* *--padjust* - method for multiple testing correction [num]
-* *--minLen*  - minimum gene size (bp) [int]
+* *\-\-pThresh* - adjusted p-value threshold [num]
+* *\-\-padjust* - method for multiple testing correction [num]
+* *\-\-minLen*  - minimum gene size (bp) [int]
 
 | The default is ``covPerGeSigOPT="--pThresh 0.001 --padjust BH --minLen 0"``. As for genomic bins, the available methods for multiple testing corrections are: "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none". Please refer to documentation of the `p.adjust <https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/p.adjust>`_ R function for more details.
 
@@ -231,7 +231,7 @@ The **sampleId.covPerGeKaryoplot/** folder includes plot generated with the `kar
 Detect, annotate and filter single nucleotide variants
 ------------------------------------------------------
 
-| The single nucleotide variants (SNVs) are detected in the *freebayes* process using the `freebayes <https://arxiv.org/abs/1207.3907>`_ program, and their effects are predicted in the *snpEff* process running `snpEff <https://pcingola.github.io/SnpEff/se_introduction/>_` with option "-ud 0".
+| The single nucleotide variants (SNVs) are detected in the *freebayes* process using the `freebayes <https://arxiv.org/abs/1207.3907>`_ program, and their effects are predicted in the *snpEff* process running `snpEff <https://pcingola.github.io/SnpEff/se_introduction/>`_ with option "-ud 0".
 | Reads with MAPQ score < than ``--MAPQ`` are not used for detection. The user can specify freebayes options through the ``--freebayesOPT`` parameter. Its default is:
 
 .. code-block:: bash
@@ -258,20 +258,20 @@ Please refer to the `freebayes manual <https://github.com/ekg/freebayes>`_ for m
 | GIP discards all SNVs mapping inside repetitive elements, removes the variant positions with multiple alternate alleles, evaluates the nucleotide composition complexity of the genomic context of each SNV (i.e. the neighbour bases) and allows the user to apply different, more stringent, filtering criteria for variants detected inside homopolymers.
 | For this purpose the ``--filterFreebayesOPT`` parameter can be used to set the following variables:
 
-* *--minFreq*          - Min. variant read frequency (VRF) [num]
-* *--maxFreq*          - Max. VRF [num]
-* *--minAO*            - Min. number of reads supporting the alternate allele [int]
-* *--minMQMR*          - Min. mean mapping quality of observed reference alleles [num]
-* *--minMQM*           - Min. mean mapping quality of observed alternate alleles [num]
-* *--MADrange*         - Discard SNVs whose sequencing depth is > or < *MADrange* MADs from the chromosome median coverage [num]
-* *--minAOhomopolymer* - Min. number of reads supporting the alternate allele mapping inside an homopolymer [int]
-* *--contextSpan*      - Size on each side of SNV genomic context (bp) [int]
-* *--homopolymerFreq*  - Base frequency cut-off to consider a genomic context a homopolymer [num]
+* *\-\-minFreq*          - Min. variant read frequency (VRF) [num]
+* *\-\-maxFreq*          - Max. VRF [num]
+* *\-\-minAO*            - Min. number of reads supporting the alternate allele [int]
+* *\-\-minMQMR*          - Min. mean mapping quality of observed reference alleles [num]
+* *\-\-minMQM*           - Min. mean mapping quality of observed alternate alleles [num]
+* *\-\-MADrange*         - Discard SNVs whose sequencing depth is > or < *MADrange* MADs from the chromosome median coverage [num]
+* *\-\-minAOhomopolymer* - Min. number of reads supporting the alternate allele mapping inside an homopolymer [int]
+* *\-\-contextSpan*      - Size on each side of SNV genomic context (bp) [int]
+* *\-\-homopolymerFreq*  - Base frequency cut-off to consider a genomic context a homopolymer [num]
 
 | Should a specific sample present a huge number of SNVs (e.g. cancer sample) the user can specify the following graphical options that do not affect the density profiles but help reducing overplotting in scatterplots:
 
-* *--hexagons*        - Replace SNV scatterplots with density hexagons
-* *--randomSNVtoShow* - Max number of random SNVs to be shown in scatterplots [num]
+* *\-\-hexagons*        - Replace SNV scatterplots with density hexagons
+* *\-\-randomSNVtoShow* - Max number of random SNVs to be shown in scatterplots [num]
 
 
 | The parameter default is:
@@ -365,15 +365,15 @@ Detect and filter structural variants
 | The genomic structural variants (SVs) are detected in the *delly* process using the `delly <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3436805/>`_ program. The SVs are predicted based on pair-end mapping orientation and split-read information, and include unbalanced rearrangements (i.e. CNV deletions, amplifications and insertions), as well as balanced rearrangements (inversions and break ends translocations). *delly* is used to predict the five SV types using just the reads passing the ``--MAPQ`` filter. The outputs are the .vcf bgzip compressed file  **gipOut/samples/sampleId/sampleId.delly.vcf.gz** and its tabix index with .tbi extension.
 | GIP allows to apply custom quality filters and select a short-list of SV predictions using the ``--filterDellyOPT`` parameter, and setting the following variables:
 
-* *--minMAPQ*      - minimum median mapping quality of paired-ends supporting the SV [int]
-* *--chrEndFilter* - number of bases spanning from the chromosome ends inwards. SVs overlapping such telomeric or sub-telomeric regions are discarded [int]
-* *--rmLowQual*    - Remove delly predictions labelled as LowQual
-* *--rmImprecise*  - Keep just delly predictions labelled as PRECISE
-* *--topRc[Bnd|Ins|Del|Dup|Inv]*        - Select top SVs based on RC score [int]
-* *--topHqCount[Bnd|Ins|Del|Dup|Inv]*   - Select top SVs based on DV+RV score [int]
-* *--topHqPercent[Bnd|Ins|Del|Dup|Inv]* - Select top SVs based on (DV+RV/DV+RV+DR+RR)*100 score [int]
+* *\-\-minMAPQ*      - minimum median mapping quality of paired-ends supporting the SV [int]
+* *\-\-chrEndFilter* - number of bases spanning from the chromosome ends inwards. SVs overlapping such telomeric or sub-telomeric regions are discarded [int]
+* *\-\-rmLowQual*    - Remove delly predictions labelled as LowQual
+* *\-\-rmImprecise*  - Keep just delly predictions labelled as PRECISE
+* *\-\-topRc[Bnd|Ins|Del|Dup|Inv]*        - Select top SVs based on RC score [int]
+* *\-\-topHqCount[Bnd|Ins|Del|Dup|Inv]*   - Select top SVs based on DV+RV score [int]
+* *\-\-topHqPercent[Bnd|Ins|Del|Dup|Inv]* - Select top SVs based on (DV+RV/DV+RV+DR+RR)*100 score [int]
 
-| The --topRc* --topHqCount* and --topHqPercent* filters are applied sequentially and consist in selecting the best predicted SVs based on 3 different quality metrics: the RC score, the DV+RV score and the (DV+RV/DV+RV+DR+RR)*100 score.
+| The \-\-topRc* \-\-topHqCount* and \-\-topHqPercent* filters are applied sequentially and consist in selecting the best predicted SVs based on 3 different quality metrics: the RC score, the DV+RV score and the (DV+RV/DV+RV+DR+RR)*100 score.
 | Unless specified in ``--filterDellyOPT``, none of these filter is used. To use these filters it is needed to specify the filter type with a suffix indicating the SV of interest: "Bnd" (break ends), "Ins" (insertions), "Del" (deletions), "Dup" (duplications) and "Inv" (inversions).
 | for instance ``--topHqCountInv 50`` would select the 50 predicted inversions with the best DV+RV score.
 | The vcf description of the RC, DV, RV, DR, RR scores is the following:

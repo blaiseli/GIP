@@ -1,6 +1,6 @@
 ##########
 binDensity
-########## 
+##########
 
 Options
 -------
@@ -20,7 +20,7 @@ Options
 |                       |                                                              |                |
 |                       |[default NA]                                                  |                |
 +-----------------------+--------------------------------------------------------------+----------------+
-|\-\-minMAPQ            |Remove bins with MAPQ < --MAPQ [default 0]                    |[int]           |
+|\-\-minMAPQ            |Remove bins with MAPQ < \-\-minMAPQ [default 0]               |[int]           |
 +-----------------------+--------------------------------------------------------------+----------------+
 |\-\-pseudocount        |Normalized mean coverage pseudocount value preventing minus   |[double]        |
 |                       |                                                              |                |
@@ -44,10 +44,10 @@ Options
 +-----------------------+--------------------------------------------------------------+----------------+
 |\-\-showSubset         |Show a random subset of genomic bins with normalized coverage |[int]           |
 |                       |                                                              |                |
-|                       |values above or below --highLowCovThresh. This random subset  |                |
+|                       |values above or below \-\-highLowCovThresh. This random subset|                |
 |                       |                                                              |                |
 |                       |does not affect the density estimation [default 50000]        |                |
-+-----------------------+--------------------------------------------------------------+----------------+  
++-----------------------+--------------------------------------------------------------+----------------+
 |\-\-debug              |Dump session and quit                                         |                |
 +-----------------------+--------------------------------------------------------------+----------------+
 |\-h, \-\-help          |Show help message                                             |                |
@@ -56,7 +56,7 @@ Options
 Description
 -----------
 | The ``binDensity`` module aims at visualizing the normalized bin sequencing coverage of multiple samples using a smoothed color density representation.
-| The module loads for all samples the GIP files with the bin sequencing coverage values (.covPerBin.gz files) and generates a smoothed color density scatterplot showing the genomic position (x-axis) and the log10 normalized coverage values (y-axis).
+| The module loads, for all samples, the GIP files with the bin sequencing coverage values (.covPerBin.gz files) and generates a smoothed color density scatterplot showing the genomic position (x-axis) and the log10 normalized coverage values (y-axis).
 
 
 Example
@@ -70,10 +70,4 @@ Example
 
 .. figure:: ../_static/binDensity.png
       :width: 100 %
-
-
-
-
-
-
 
